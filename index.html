@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunny's Pizza</title>
+
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f7f3eb;
+        color: #292929;
+    }
+
+    header {
+        background: #b32626;
+        color: white;
+        text-align: center;
+        padding: 22px 15px;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 2.4rem;
+    }
+
+    header p {
+        margin: 6px 0 0;
+    }
+
+    nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #222;
+        color: white;
+        display: flex;
+        justify-content: center;
+        gap: 35px;
+        padding: 12px;
+        font-weight: bold;
+    }
+
+    nav span {
+        cursor: pointer;
+    }
+
+    main {
+        max-width: 1050px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    h2 {
+        color: #a51f1f;
+        border-bottom: 3px solid #a51f1f;
+        padding-bottom: 6px;
+    }
+
+    .intro {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .pizzas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 20px;
+    }
+
+    .pizza {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 7px #bbb;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pizza-icon {
+        font-size: 4rem;
+        text-align: center;
+    }
+
+    .pizza h3 {
+        margin-bottom: 5px;
+    }
+
+    .pizza-description {
+        flex-grow: 1;
+    }
+
+    .price {
+        font-weight: bold;
+        color: #a51f1f;
+    }
+
+    button {
+        background: #16833c;
+        color: white;
+        border: 0;
+        border-radius: 6px;
+        padding: 11px 17px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #10682f;
+    }
+
+    .secondary {
+        background: #555;
+    }
+
+    .danger {
+        background: #a51f1f;
+    }
+
+    .builder, .cart, .checkout {
+        margin-top: 35px;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 7px #ccc;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    select {
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        width: 100%;
+        max-width: 400px;
+        background: white;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .toppings {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+        max-width: 650px;
+    }
+
+    .current-price {
+        background: #eef7ee;
+        border-left: 5px solid #16833c;
+        padding: 15px;
+        margin: 20px 0;
+        font-size: 1.2rem;
+        max-width: 400px;
+    }
+
+    .cart-item {
+        border-bottom: 1px solid #ddd;
+        padding: 18px 0;
+    }
+
+    .cart-item:last-child {
+        border-bottom: 0;
+    }
+
+    .item-title {
+        font-size: 1.1rem;
+    }
+
+    .cart-controls {
+        margin-top: 12px;
+    }
+
+    .cart-controls button {
+        padding: 6px 11px;
+        margin-right: 4px;
+    }
+
+    .summary {
+        border-top: 2px solid #333;
+        margin-top: 20px;
+        padding-top: 15px;
+        max-width: 400px;
+        margin-left: auto;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0;
+    }
+
+    .total {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    .notice {
+        background: #fff3cd;
+        border: 1px solid #e1ba42;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 20px 0;
+    }
+
+    .checkout-option {
+        margin: 25px 0;
+    }
+
+    #success {
+        text-align: center;
+        background: white;
+        padding: 50px 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 7px #ccc;
+    }
+
+    #success .big {
+        font-size: 5rem;
+    }
+
+    .order-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        background: #eee;
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 6px;
+    }
+
+    footer {
+        margin-top: 50px;
+        background: #222;
+        color: white;
+        text-align: center;
+        padding: 25px;
+    }
+
+    @media(max-width: 600px) {
+        nav {
+            gap: 15px;
+            font-size: .9rem;
+        }
+
+        main {
+            padding: 0 12px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍕 Sunny's Pizza</h1>
+    <p>Hot pizza. Fresh ingredients. Great taste.</p>
+</header>
+
+<nav>
+    <span onclick="showMenu()">MENU</span>
+    <span onclick="showMenu()">PIZZAS</span>
+    <span onclick="showCart()">MY ORDER 🛒 <span id="cartCount">0</span></span>
+</nav>
+
+<main>
+
+<!-- MENU -->
+
+<section id="menu">
+
+    <div class="intro">
+        <h1>What are you hungry for?</h1>
+        <p>Choose your favorite pizza and make it your own!</p>
+    </div>
+
+    <h2>Our Pizzas</h2>
+
+    <div class="pizzas">
+
+        <div class="pizza">
+            <div class="pizza-icon">🧀</div>
+            <h3>Classic Cheese</h3>
+            <p class="pizza-description">
+                Tomato sauce and lots of mozzarella cheese.
+            </p>
+            <p class="price">from $10.99</p>
+            <button onclick="choosePizza('Classic Cheese', 10.99)">
+                Choose
+            </button>
+        </div>
+
+        <div class="pizza">
+            <div class="pizza-icon">🍕</div>
+            <h3>Pepperoni</h3>
+            <p class="pizza-description">
+                Tomato sauce, mozzarella and pepperoni.
+            </p>
+            <p class="price">from $12.99</p>
+            <button onclick="choosePizza('Pepperoni', 12.99)">
+                Choose
+            </button>
+        </div>
+
+        <div class="pizza">
+            <div class="pizza-icon">🫑</div>
+            <h3>Veggie</h3>
+            <p class="pizza-description">
+                Mushrooms, onions, peppers, tomatoes and cheese.
+            </p>
+            <p class="price">from $13.99</p>
+            <button onclick="choosePizza('Veggie', 13.99)">
+                Choose
+            </button>
+        </div>
+
+        <div class="pizza">
+            <div class="pizza-icon">🍍</div>
+            <h3>Hawaiian</h3>
+            <p class="pizza-description">
+                Ham, pineapple and mozzarella cheese.
+            </p>
+            <p class="price">from $13.99</p>
+            <button onclick="choosePizza('Hawaiian', 13.99)">
+                Choose
+            </button>
+        </div>
+
+        <div class="pizza">
+            <div class="pizza-icon">🥓</div>
+            <h3>Meat Lovers</h3>
+            <p class="pizza-description">
+                Pepperoni, sausage, ham, bacon and cheese.
+            </p>
+            <p class="price">from $15.99</p>
+            <button onclick="choosePizza('Meat Lovers', 15.99)">
+                Choose
+            </button>
+        </div>
+
+        <div class="pizza">
+            <div class="pizza-icon">🌶️</div>
+            <h3>Spicy Chicken</h3>
+            <p class="pizza-description">
+                Chicken, peppers, onions and spicy sauce.
+            </p>
+            <p class="price">from $14.99</p>
+            <button onclick="choosePizza('Spicy Chicken', 14.99)">
+                Choose
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PIZZA BUILDER -->
+
+<section id="builder" class="builder hidden">
+
+    <h2>Build Your Pizza</h2>
+
+    <h3 id="pizzaName"></h3>
+
+    <h3>1. Choose your size</h3>
+
+    <select id="size" onchange="updateBuilderPrice()">
+        <option value="0">Small – 10"</option>
+        <option value="3">Medium – 12" (+$3.00)</option>
+        <option value="6">Large – 14" (+$6.00)</option>
+    </select>
+
+    <h3>2. Choose extra toppings</h3>
+
+    <p>Each extra topping is $1.50.</p>
+
+    <div class="toppings">
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Extra cheese"
+                   onchange="updateBuilderPrice()">
+            Extra cheese
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Pepperoni"
+                   onchange="updateBuilderPrice()">
+            Pepperoni
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Chicken"
+                   onchange="updateBuilderPrice()">
+            Chicken
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Mushrooms"
+                   onchange="updateBuilderPrice()">
+            Mushrooms
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Onions"
+                   onchange="updateBuilderPrice()">
+            Onions
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Peppers"
+                   onchange="updateBuilderPrice()">
+            Peppers
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Pineapple"
+                   onchange="updateBuilderPrice()">
+            Pineapple
+        </label>
+
+        <label>
+            <input type="checkbox" class="topping"
+                   value="Bacon"
+                   onchange="updateBuilderPrice()">
+            Bacon
+        </label>
+
+    </div>
+
+    <div class="current-price">
+        Your pizza: <strong id="builderPrice">$0.00</strong>
+    </div>
+
+    <button onclick="addToCart()">Add to Order</button>
+    <button class="secondary" onclick="showMenu()">Back to Menu</button>
+
+</section>
+
+
+<!-- CART -->
+
+<section id="cart" class="cart hidden">
+
+    <h2>🛒 My Order</h2>
+
+    <div id="cartItems"></div>
+
+    <div id="cartSummary"></div>
+
+    <br>
+
+    <button onclick="showMenu()">Add More Food</button>
+    <button id="checkoutButton" onclick="showCheckout()">
+        Checkout
+    </button>
+
+</section>
+
+
+<!-- CHECKOUT -->
+
+<section id="checkout" class="checkout hidden">
+
+    <h2>Checkout</h2>
+
+    <div class="notice">
+        <strong>Pickup Order</strong><br>
+        Pick up your order at Sunny's Pizza,
+        125 Main Street.
+    </div>
+
+    <div class="checkout-option">
+
+        <h3>1. Choose a pickup time</h3>
+
+        <select id="pickupTime">
+            <option value="">Choose a time...</option>
+            <option>5:30 PM</option>
+            <option>6:00 PM</option>
+            <option>6:30 PM</option>
+            <option>7:00 PM</option>
+            <option>7:30 PM</option>
+        </select>
+
+    </div>
+
+
+    <div class="checkout-option">
+
+        <h3>2. How would you like to pay?</h3>
+
+        <label>
+            <input type="radio" name="payment"
+                   value="Cash">
+            💵 Cash at pickup
+        </label>
+
+        <label>
+            <input type="radio" name="payment"
+                   value="Card">
+            💳 Card at pickup
+        </label>
+
+    </div>
+
+
+    <div id="checkoutTotal"></div>
+
+    <br>
+
+    <button onclick="placeOrder()">Place Order</button>
+
+    <button class="secondary" onclick="showCart()">
+        Back to My Order
+    </button>
+
+</section>
+
+
+<!-- SUCCESS -->
+
+<section id="success" class="hidden">
+
+    <div class="big">🍕</div>
+
+    <h1>Thank you!</h1>
+
+    <h2>Your order is confirmed.</h2>
+
+    <p>Your order number is:</p>
+
+    <div class="order-number" id="orderNumber"></div>
+
+    <p>
+        Pickup time:<br>
+        <strong id="confirmedTime"></strong>
+    </p>
+
+    <p>
+        See you soon at<br>
+        <strong>Sunny's Pizza · 125 Main Street</strong>
+    </p>
+
+    <button onclick="newOrder()">Order Again</button>
+
+</section>
+
+</main>
+
+
+<footer>
+    <strong>Sunny's Pizza</strong><br>
+    125 Main Street · Springfield, USA<br><br>
+    Open every day · 11 AM – 11 PM
+</footer>
+
+
+<script>
+
+let selectedPizza = "";
+let selectedBasePrice = 0;
+let cart = [];
+
+
+/* ---------- NAVIGATION ---------- */
+
+function hideAll() {
+    document.getElementById("menu").classList.add("hidden");
+    document.getElementById("builder").classList.add("hidden");
+    document.getElementById("cart").classList.add("hidden");
+    document.getElementById("checkout").classList.add("hidden");
+    document.getElementById("success").classList.add("hidden");
+}
+
+
+function showMenu() {
+    hideAll();
+    document.getElementById("menu").classList.remove("hidden");
+    window.scrollTo(0, 0);
+}
+
+
+/* ---------- PIZZA BUILDER ---------- */
+
+function choosePizza(name, price) {
+
+    selectedPizza = name;
+    selectedBasePrice = price;
+
+    document.getElementById("pizzaName").textContent = name;
+    document.getElementById("size").selectedIndex = 0;
+
+    document.querySelectorAll(".topping").forEach(t => {
+        t.checked = false;
+    });
+
+    updateBuilderPrice();
+
+    hideAll();
+    document.getElementById("builder").classList.remove("hidden");
+
+    window.scrollTo(0, 0);
+}
+
+
+function getBuilderPrice() {
+
+    const sizeExtra =
+        Number(document.getElementById("size").value);
+
+    const toppingCount =
+        document.querySelectorAll(".topping:checked").length;
+
+    return selectedBasePrice +
+           sizeExtra +
+           toppingCount * 1.50;
+}
+
+
+function updateBuilderPrice() {
+
+    document.getElementById("builderPrice").textContent =
+        "$" + getBuilderPrice().toFixed(2);
+}
+
+
+function addToCart() {
+
+    const sizeSelect = document.getElementById("size");
+
+    const sizeName =
+        sizeSelect.options[sizeSelect.selectedIndex]
+            .text.split("–")[0].trim();
+
+    let toppings = [];
+
+    document.querySelectorAll(".topping:checked").forEach(t => {
+        toppings.push(t.value);
+    });
+
+    cart.push({
+        name: selectedPizza,
+        size: sizeName,
+        toppings: toppings,
+        price: getBuilderPrice(),
+        quantity: 1
+    });
+
+    updateCartCount();
+    showCart();
+}
+
+
+/* ---------- CART ---------- */
+
+function updateCartCount() {
+
+    let count = 0;
+
+    cart.forEach(item => {
+        count += item.quantity;
+    });
+
+    document.getElementById("cartCount").textContent = count;
+}
+
+
+function calculateSubtotal() {
+
+    let subtotal = 0;
+
+    cart.forEach(item => {
+        subtotal += item.price * item.quantity;
+    });
+
+    return subtotal;
+}
+
+
+function calculateTotal() {
+
+    const subtotal = calculateSubtotal();
+
+    /*
+       Simplified fictional sales tax.
+       Sunny's Pizza is not a real restaurant.
+    */
+
+    const tax = subtotal * 0.07;
+
+    return {
+        subtotal: subtotal,
+        tax: tax,
+        total: subtotal + tax
+    };
+}
+
+
+function showCart() {
+
+    hideAll();
+
+    document.getElementById("cart").classList.remove("hidden");
+
+    renderCart();
+
+    window.scrollTo(0, 0);
+}
+
+
+function renderCart() {
+
+    const container =
+        document.getElementById("cartItems");
+
+    const summary =
+        document.getElementById("cartSummary");
+
+    const checkoutButton =
+        document.getElementById("checkoutButton");
+
+    container.innerHTML = "";
+
+
+    if (cart.length === 0) {
+
+        container.innerHTML =
+            "<p>Your order is empty.</p>";
+
+        summary.innerHTML = "";
+
+        checkoutButton.style.display = "none";
+
+        return;
+    }
+
+
+    checkoutButton.style.display = "inline-block";
+
+
+    cart.forEach((item, index) => {
+
+        let toppings = "No extra toppings";
+
+        if (item.toppings.length > 0) {
+            toppings = item.toppings.join(", ");
+        }
+
+        const itemTotal =
+            item.price * item.quantity;
+
+
+        container.innerHTML += `
+
+            <div class="cart-item">
+
+                <div class="item-title">
+                    <strong>
+                        ${item.quantity} × ${item.name}
+                    </strong>
+                </div>
+
+                <br>
+
+                Size: ${item.size}<br>
+                Extra toppings: ${toppings}
+
+                <br><br>
+
+                <strong>
+                    $${itemTotal.toFixed(2)}
+                </strong>
+
+                <div class="cart-controls">
+
+                    <button onclick="changeQuantity(${index}, -1)">
+                        −
+                    </button>
+
+                    <button onclick="changeQuantity(${index}, 1)">
+                        +
+                    </button>
+
+                    <button class="danger"
+                            onclick="removeItem(${index})">
+                        Remove
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+
+    const totals = calculateTotal();
+
+
+    summary.innerHTML = `
+
+        <div class="summary">
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>
+                    $${totals.subtotal.toFixed(2)}
+                </span>
+            </div>
+
+            <div class="summary-row">
+                <span>Tax</span>
+                <span>
+                    $${totals.tax.toFixed(2)}
+                </span>
+            </div>
+
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>
+                    $${totals.total.toFixed(2)}
+                </span>
+            </div>
+
+        </div>
+    `;
+}
+
+
+function changeQuantity(index, amount) {
+
+    cart[index].quantity += amount;
+
+    if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    updateCartCount();
+    renderCart();
+}
+
+
+function removeItem(index) {
+
+    cart.splice(index, 1);
+
+    updateCartCount();
+    renderCart();
+}
+
+
+/* ---------- CHECKOUT ---------- */
+
+function showCheckout() {
+
+    if (cart.length === 0) {
+        return;
+    }
+
+    hideAll();
+
+    document.getElementById("checkout")
+        .classList.remove("hidden");
+
+    const totals = calculateTotal();
+
+    document.getElementById("checkoutTotal").innerHTML = `
+
+        <div class="summary">
+
+            <div class="summary-row total">
+                <span>Order Total</span>
+                <span>
+                    $${totals.total.toFixed(2)}
+                </span>
+            </div>
+
+        </div>
+    `;
+
+    window.scrollTo(0, 0);
+}
+
+
+function placeOrder() {
+
+    const pickupTime =
+        document.getElementById("pickupTime").value;
+
+    const payment =
+        document.querySelector(
+            'input[name="payment"]:checked'
+        );
+
+
+    if (!pickupTime) {
+
+        alert("Please choose a pickup time.");
+
+        return;
+    }
+
+
+    if (!payment) {
+
+        alert("Please choose a payment method.");
+
+        return;
+    }
+
+
+    /*
+       Generate a fictional order number.
+       No information is sent anywhere.
+    */
+
+    const orderNumber =
+        Math.floor(100 + Math.random() * 900);
+
+
+    document.getElementById("orderNumber")
+        .textContent = "#" + orderNumber;
+
+    document.getElementById("confirmedTime")
+        .textContent = pickupTime;
+
+
+    hideAll();
+
+    document.getElementById("success")
+        .classList.remove("hidden");
+
+    window.scrollTo(0, 0);
+}
+
+
+/* ---------- NEW ORDER ---------- */
+
+function newOrder() {
+
+    cart = [];
+
+    updateCartCount();
+
+    document.getElementById("pickupTime").selectedIndex = 0;
+
+    document.querySelectorAll(
+        'input[name="payment"]'
+    ).forEach(input => {
+        input.checked = false;
+    });
+
+    showMenu();
+}
+
+</script>
+
+</body>
+</html>
